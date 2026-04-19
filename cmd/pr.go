@@ -286,7 +286,7 @@ var prRemoveLabelsCmd = &cobra.Command{
 var prAssigneesCmd = &cobra.Command{
 	Use:   "assignees <number>",
 	Short: "List PR assignees",
-	Long:  `List assignees on a pull request.`,
+	Long:  `List assignees on a pull request (uses requested_reviewers API).`,
 	Args:  cobra.ExactArgs(1),
 	RunE: func(cmd *cobra.Command, args []string) error {
 		repo, _ := cmd.Flags().GetString("repo")
@@ -302,7 +302,7 @@ var prAssigneesCmd = &cobra.Command{
 		s.Suffix = " Loading assignees..."
 		s.Start()
 
-		data, err := httpclient.Get(fmt.Sprintf("/repos/%s/pulls/%s/assignees", repo, number))
+		data, err := httpclient.Get(fmt.Sprintf("/repos/%s/pulls/%s/requested_reviewers", repo, number))
 		s.Stop()
 
 		if err != nil {
@@ -324,10 +324,16 @@ var prAddAssigneesCmd = &cobra.Command{
 	RunE: func(cmd *cobra.Command, args []string) error {
 		repo, _ := cmd.Flags().GetString("repo")
 		number := args[0]
-		assignees, _ := cmd.Flags().GetStringArray("assignee")
+		assigneesStr, _ := cmd.Flags().GetString("assignee")
 
 		if repo == "" {
 			fmt.Fprintln(os.Stderr, "Repository required. Use -R owner/repo")
+			os.Exit(1)
+			return nil
+		}
+
+		if assigneesStr == "" {
+			fmt.Fprintln(os.Stderr, "Assignee required. Use --assignee")
 			os.Exit(1)
 			return nil
 		}
@@ -336,7 +342,7 @@ var prAddAssigneesCmd = &cobra.Command{
 		s.Suffix = " Adding assignees..."
 		s.Start()
 
-		reqBody := map[string][]string{"assignees": assignees}
+		reqBody := map[string]string{"assignees": assigneesStr}
 		data, err := httpclient.Post(fmt.Sprintf("/repos/%s/pulls/%s/assignees", repo, number), reqBody)
 		s.Stop()
 
@@ -359,10 +365,16 @@ var prRemoveAssigneesCmd = &cobra.Command{
 	RunE: func(cmd *cobra.Command, args []string) error {
 		repo, _ := cmd.Flags().GetString("repo")
 		number := args[0]
-		assignees, _ := cmd.Flags().GetStringArray("assignee")
+		assigneesStr, _ := cmd.Flags().GetString("assignee")
 
 		if repo == "" {
 			fmt.Fprintln(os.Stderr, "Repository required. Use -R owner/repo")
+			os.Exit(1)
+			return nil
+		}
+
+		if assigneesStr == "" {
+			fmt.Fprintln(os.Stderr, "Assignee required. Use --assignee")
 			os.Exit(1)
 			return nil
 		}
@@ -371,8 +383,8 @@ var prRemoveAssigneesCmd = &cobra.Command{
 		s.Suffix = " Removing assignees..."
 		s.Start()
 
-		reqBody := map[string][]string{"assignees": assignees}
-		data, err := httpclient.Patch(fmt.Sprintf("/repos/%s/pulls/%s/assignees", repo, number), reqBody)
+		reqBody := map[string]string{"assignees": assigneesStr}
+		err := httpclient.DeleteWithBody(fmt.Sprintf("/repos/%s/pulls/%s/assignees", repo, number), reqBody)
 		s.Stop()
 
 		if err != nil {
@@ -381,7 +393,7 @@ var prRemoveAssigneesCmd = &cobra.Command{
 			return nil
 		}
 
-		printJSON(data)
+		fmt.Println("Assignees removed successfully")
 		return nil
 	},
 }
@@ -405,7 +417,7 @@ var prReviewersCmd = &cobra.Command{
 		s.Suffix = " Loading reviewers..."
 		s.Start()
 
-		data, err := httpclient.Get(fmt.Sprintf("/repos/%s/pulls/%s/option-approval-reviewers", repo, number))
+		data, err := httpclient.Get(fmt.Sprintf("/repos/%s/pulls/%s/option_reviewers", repo, number))
 		s.Stop()
 
 		if err != nil {
@@ -541,7 +553,7 @@ var prTestersCmd = &cobra.Command{
 		s.Suffix = " Loading testers..."
 		s.Start()
 
-		data, err := httpclient.Get(fmt.Sprintf("/repos/%s/pulls/%s/option-approval-testers", repo, number))
+		data, err := httpclient.Get(fmt.Sprintf("/repos/%s/pulls/%s/option_testers", repo, number))
 		s.Stop()
 
 		if err != nil {
@@ -1024,9 +1036,9 @@ func init() {
 
 	prAssigneesCmd.Flags().StringP("repo", "R", "", "Select repository (OWNER/REPO)")
 	prAddAssigneesCmd.Flags().StringP("repo", "R", "", "Select repository (OWNER/REPO)")
-	prAddAssigneesCmd.Flags().StringArrayP("assignee", "a", []string{}, "Assignee username (can specify multiple)")
+	prAddAssigneesCmd.Flags().StringP("assignee", "a", "", "Assignee username(s), comma-separated if multiple")
 	prRemoveAssigneesCmd.Flags().StringP("repo", "R", "", "Select repository (OWNER/REPO)")
-	prRemoveAssigneesCmd.Flags().StringArrayP("assignee", "a", []string{}, "Assignee username (can specify multiple)")
+	prRemoveAssigneesCmd.Flags().StringP("assignee", "a", "", "Assignee username(s), comma-separated if multiple")
 
 	prReviewersCmd.Flags().StringP("repo", "R", "", "Select repository (OWNER/REPO)")
 	prAddReviewersCmd.Flags().StringP("repo", "R", "", "Select repository (OWNER/REPO)")
