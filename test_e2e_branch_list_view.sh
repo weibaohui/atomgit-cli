@@ -2,9 +2,9 @@
 # E2E Test: atomgit branch list/view
 set -e
 
-REPO="weibaohui/atomgit-cli"
+REPO="${ATOMGIT_TEST_REPO:-weibaohui/atomgit-cli-e2e-test}"
 ATOMGIT_TOKEN="${ATOMGIT_TOKEN:-}"
-ATOMGIT_CLI="/tmp/atomgit-test"
+CLI="./atomgit"
 
 echo "=== Testing atomgit branch list/view ==="
 
@@ -15,12 +15,12 @@ fi
 
 # Test 1: List branches
 echo "Test 1: List branches"
-$ATOMGIT_CLI branch list -R "$REPO"
+$CLI branch list -R "$REPO"
 echo "✓ Branch list retrieved"
 
 # Test 2: View main branch
 echo "Test 2: View main branch"
-$ATOMGIT_CLI branch view main -R "$REPO"
+$CLI branch view main -R "$REPO"
 echo "✓ Branch view passed"
 
 echo "=== branch list/view tests passed ==="

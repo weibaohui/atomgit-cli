@@ -8,12 +8,8 @@ echo "=========================================="
 echo "Running All Branch E2E Tests"
 echo "=========================================="
 
-# Cleanup temp binary on exit
-ATOMGIT_CLI="/tmp/atomgit-test"
-trap 'rm -f "$ATOMGIT_CLI"' EXIT
-
 # Build once
-go build -o "$ATOMGIT_CLI" .
+go build -o ./atomgit .
 
 # Run each test file
 for test_file in test_e2e_branch_list_view.sh test_e2e_branch_create.sh test_e2e_branch_delete.sh test_e2e_branch_protect.sh; do

@@ -1,7 +1,10 @@
 #!/bin/bash
 # E2E Test: atomgit PR reviewers and testers
 
-REPO="weibaohui/atomgit-cli"
+REPO="${2:-$ATOMGIT_TEST_REPO}"
+if [ -z "$REPO" ]; then
+    REPO="weibaohui/atomgit-cli-e2e-test"
+fi
 ATOMGIT_TOKEN="${ATOMGIT_TOKEN:-}"
 CLI="./atomgit"
 PR_NUMBER="${1:-1}"

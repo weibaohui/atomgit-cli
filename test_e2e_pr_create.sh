@@ -1,7 +1,10 @@
 #!/bin/bash
 # E2E Test: atomgit PR creation
 
-REPO="weibaohui/atomgit-cli"
+REPO="${1:-$ATOMGIT_TEST_REPO}"
+if [ -z "$REPO" ]; then
+    REPO="weibaohui/atomgit-cli-e2e-test"
+fi
 ATOMGIT_TOKEN="${ATOMGIT_TOKEN:-}"
 CLI="./atomgit"
 TEST_BRANCH="test-pr-branch-$(date +%s)"
