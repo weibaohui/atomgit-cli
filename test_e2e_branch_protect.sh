@@ -1,7 +1,7 @@
 #!/bin/bash
 # E2E Test: atomgit branch protect/unprotect
 
-REPO="${ATOMGIT_TEST_REPO:-weibaohui/atomgit-cli-e2e-test}"
+REPO="${ATOMGIT_TEST_REPO:-weibaohui/atomgit-cli}"
 BRANCH_NAME="test-branch-protect-$(date +%s)"
 ATOMGIT_TOKEN="${ATOMGIT_TOKEN:-}"
 CLI="./atomgit"

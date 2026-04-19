@@ -1,7 +1,7 @@
 #!/bin/bash
 # E2E Test: atomgit branch create
 
-REPO="${ATOMGIT_TEST_REPO:-weibaohui/atomgit-cli-e2e-test}"
+REPO="${ATOMGIT_TEST_REPO:-weibaohui/atomgit-cli}"
 BRANCH_NAME="test-branch-$(date +%s)"
 ATOMGIT_TOKEN="${ATOMGIT_TOKEN:-}"
 CLI="./atomgit"

@@ -2,7 +2,7 @@
 # E2E Test: atomgit branch list/view
 set -e
 
-REPO="${ATOMGIT_TEST_REPO:-weibaohui/atomgit-cli-e2e-test}"
+REPO="${ATOMGIT_TEST_REPO:-weibaohui/atomgit-cli}"
 ATOMGIT_TOKEN="${ATOMGIT_TOKEN:-}"
 CLI="./atomgit"
 
