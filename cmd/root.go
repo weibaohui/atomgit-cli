@@ -51,4 +51,5 @@ func init() {
 	rootCmd.AddCommand(subscriberCmd)
 	rootCmd.AddCommand(languageCmd)
 	rootCmd.AddCommand(contributorCmd)
+	rootCmd.AddCommand(hookCmd)
 }
