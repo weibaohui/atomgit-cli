@@ -95,10 +95,12 @@ var branchCreateCmd = &cobra.Command{
 		}
 
 		body := map[string]interface{}{
-			"name": branch,
+			"branch_name": branch,
 		}
 		if sha != "" {
-			body["sha"] = sha
+			body["refs"] = sha
+		} else {
+			body["refs"] = "main"
 		}
 
 		s := spinner.New(spinner.CharSets[14], 100*1000*1000)
@@ -167,11 +169,15 @@ var branchProtectCmd = &cobra.Command{
 			return nil
 		}
 
+		body := map[string]interface{}{
+			"wildcard": branch,
+		}
+
 		s := spinner.New(spinner.CharSets[14], 100*1000*1000)
 		s.Suffix = fmt.Sprintf(" Protecting branch %s...", branch)
 		s.Start()
 
-		data, err := httpclient.Put(fmt.Sprintf("/repos/%s/branches/%s/setting", repo, branch), nil)
+		data, err := httpclient.Put(fmt.Sprintf("/repos/%s/branches/setting/new", repo), body)
 		s.Stop()
 
 		if err != nil {
@@ -234,7 +240,7 @@ var branchProtectedListCmd = &cobra.Command{
 		s.Suffix = " Loading protected branches..."
 		s.Start()
 
-		data, err := httpclient.Get(fmt.Sprintf("/repos/%s/protect-branches", repo))
+		data, err := httpclient.Get(fmt.Sprintf("/repos/%s/protect_branches", repo))
 		s.Stop()
 
 		if err != nil {
