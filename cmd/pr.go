@@ -386,6 +386,427 @@ var prRemoveAssigneesCmd = &cobra.Command{
 	},
 }
 
+var prReviewersCmd = &cobra.Command{
+	Use:   "reviewers <number>",
+	Short: "List available reviewers",
+	Long:  `List available reviewers for a pull request.`,
+	Args:  cobra.ExactArgs(1),
+	RunE: func(cmd *cobra.Command, args []string) error {
+		repo, _ := cmd.Flags().GetString("repo")
+		number := args[0]
+
+		if repo == "" {
+			fmt.Fprintln(os.Stderr, "Repository required. Use -R owner/repo")
+			os.Exit(1)
+			return nil
+		}
+
+		s := spinner.New(spinner.CharSets[14], 100*1000*1000)
+		s.Suffix = " Loading reviewers..."
+		s.Start()
+
+		data, err := httpclient.Get(fmt.Sprintf("/repos/%s/pulls/%s/option-approval-reviewers", repo, number))
+		s.Stop()
+
+		if err != nil {
+			fmt.Fprintf(os.Stderr, "Failed to list reviewers: %v\n", err)
+			os.Exit(1)
+			return nil
+		}
+
+		printJSON(data)
+		return nil
+	},
+}
+
+var prAddReviewersCmd = &cobra.Command{
+	Use:   "add-reviewers <number>",
+	Short: "Add approval reviewers",
+	Long:  `Add approval reviewers to a pull request.`,
+	Args:  cobra.ExactArgs(1),
+	RunE: func(cmd *cobra.Command, args []string) error {
+		repo, _ := cmd.Flags().GetString("repo")
+		number := args[0]
+		reviewers, _ := cmd.Flags().GetStringArray("reviewer")
+
+		if repo == "" {
+			fmt.Fprintln(os.Stderr, "Repository required. Use -R owner/repo")
+			os.Exit(1)
+			return nil
+		}
+
+		s := spinner.New(spinner.CharSets[14], 100*1000*1000)
+		s.Suffix = " Adding reviewers..."
+		s.Start()
+
+		reqBody := map[string][]string{"reviewers": reviewers}
+		data, err := httpclient.Post(fmt.Sprintf("/repos/%s/pulls/%s/approval-reviewers", repo, number), reqBody)
+		s.Stop()
+
+		if err != nil {
+			fmt.Fprintf(os.Stderr, "Failed to add reviewers: %v\n", err)
+			os.Exit(1)
+			return nil
+		}
+
+		printJSON(data)
+		return nil
+	},
+}
+
+var prRemoveReviewersCmd = &cobra.Command{
+	Use:   "remove-reviewers <number>",
+	Short: "Remove approval reviewers",
+	Long:  `Remove approval reviewers from a pull request.`,
+	Args:  cobra.ExactArgs(1),
+	RunE: func(cmd *cobra.Command, args []string) error {
+		repo, _ := cmd.Flags().GetString("repo")
+		number := args[0]
+		reviewers, _ := cmd.Flags().GetStringArray("reviewer")
+
+		if repo == "" {
+			fmt.Fprintln(os.Stderr, "Repository required. Use -R owner/repo")
+			os.Exit(1)
+			return nil
+		}
+
+		s := spinner.New(spinner.CharSets[14], 100*1000*1000)
+		s.Suffix = " Removing reviewers..."
+		s.Start()
+
+		reqBody := map[string][]string{"reviewers": reviewers}
+		err := httpclient.DeleteWithBody(fmt.Sprintf("/repos/%s/pulls/%s/approval-reviewers", repo, number), reqBody)
+		s.Stop()
+
+		if err != nil {
+			fmt.Fprintf(os.Stderr, "Failed to remove reviewers: %v\n", err)
+			os.Exit(1)
+			return nil
+		}
+
+		fmt.Println("Reviewers removed successfully")
+		return nil
+	},
+}
+
+var prOperateLogsCmd = &cobra.Command{
+	Use:   "operate-logs <number>",
+	Short: "Get PR operation logs",
+	Long:  `Get operation logs for a pull request.`,
+	Args:  cobra.ExactArgs(1),
+	RunE: func(cmd *cobra.Command, args []string) error {
+		repo, _ := cmd.Flags().GetString("repo")
+		number := args[0]
+
+		if repo == "" {
+			fmt.Fprintln(os.Stderr, "Repository required. Use -R owner/repo")
+			os.Exit(1)
+			return nil
+		}
+
+		s := spinner.New(spinner.CharSets[14], 100*1000*1000)
+		s.Suffix = " Loading operate logs..."
+		s.Start()
+
+		data, err := httpclient.Get(fmt.Sprintf("/repos/%s/pulls/%s/operate-logs", repo, number))
+		s.Stop()
+
+		if err != nil {
+			fmt.Fprintf(os.Stderr, "Failed to get operate logs: %v\n", err)
+			os.Exit(1)
+			return nil
+		}
+
+		printJSON(data)
+		return nil
+	},
+}
+
+var prTestersCmd = &cobra.Command{
+	Use:   "testers <number>",
+	Short: "List PR testers",
+	Long:  `List testers on a pull request.`,
+	Args:  cobra.ExactArgs(1),
+	RunE: func(cmd *cobra.Command, args []string) error {
+		repo, _ := cmd.Flags().GetString("repo")
+		number := args[0]
+
+		if repo == "" {
+			fmt.Fprintln(os.Stderr, "Repository required. Use -R owner/repo")
+			os.Exit(1)
+			return nil
+		}
+
+		s := spinner.New(spinner.CharSets[14], 100*1000*1000)
+		s.Suffix = " Loading testers..."
+		s.Start()
+
+		data, err := httpclient.Get(fmt.Sprintf("/repos/%s/pulls/%s/option-approval-testers", repo, number))
+		s.Stop()
+
+		if err != nil {
+			fmt.Fprintf(os.Stderr, "Failed to list testers: %v\n", err)
+			os.Exit(1)
+			return nil
+		}
+
+		printJSON(data)
+		return nil
+	},
+}
+
+var prAddTestersCmd = &cobra.Command{
+	Use:   "add-testers <number>",
+	Short: "Add PR testers",
+	Long:  `Add testers to a pull request.`,
+	Args:  cobra.ExactArgs(1),
+	RunE: func(cmd *cobra.Command, args []string) error {
+		repo, _ := cmd.Flags().GetString("repo")
+		number := args[0]
+		testers, _ := cmd.Flags().GetStringArray("tester")
+
+		if repo == "" {
+			fmt.Fprintln(os.Stderr, "Repository required. Use -R owner/repo")
+			os.Exit(1)
+			return nil
+		}
+
+		s := spinner.New(spinner.CharSets[14], 100*1000*1000)
+		s.Suffix = " Adding testers..."
+		s.Start()
+
+		reqBody := map[string][]string{"testers": testers}
+		data, err := httpclient.Post(fmt.Sprintf("/repos/%s/pulls/%s/testers", repo, number), reqBody)
+		s.Stop()
+
+		if err != nil {
+			fmt.Fprintf(os.Stderr, "Failed to add testers: %v\n", err)
+			os.Exit(1)
+			return nil
+		}
+
+		printJSON(data)
+		return nil
+	},
+}
+
+var prRemoveTestersCmd = &cobra.Command{
+	Use:   "remove-testers <number>",
+	Short: "Remove PR testers",
+	Long:  `Remove testers from a pull request.`,
+	Args:  cobra.ExactArgs(1),
+	RunE: func(cmd *cobra.Command, args []string) error {
+		repo, _ := cmd.Flags().GetString("repo")
+		number := args[0]
+		testers, _ := cmd.Flags().GetStringArray("tester")
+
+		if repo == "" {
+			fmt.Fprintln(os.Stderr, "Repository required. Use -R owner/repo")
+			os.Exit(1)
+			return nil
+		}
+
+		s := spinner.New(spinner.CharSets[14], 100*1000*1000)
+		s.Suffix = " Removing testers..."
+		s.Start()
+
+		reqBody := map[string][]string{"testers": testers}
+		err := httpclient.DeleteWithBody(fmt.Sprintf("/repos/%s/pulls/%s/testers", repo, number), reqBody)
+		s.Stop()
+
+		if err != nil {
+			fmt.Fprintf(os.Stderr, "Failed to remove testers: %v\n", err)
+			os.Exit(1)
+			return nil
+		}
+
+		fmt.Println("Testers removed successfully")
+		return nil
+	},
+}
+
+var prLinkedIssuesCmd = &cobra.Command{
+	Use:   "linked-issues <number>",
+	Short: "List linked issues",
+	Long:  `List issues linked to a pull request.`,
+	Args:  cobra.ExactArgs(1),
+	RunE: func(cmd *cobra.Command, args []string) error {
+		repo, _ := cmd.Flags().GetString("repo")
+		number := args[0]
+
+		if repo == "" {
+			fmt.Fprintln(os.Stderr, "Repository required. Use -R owner/repo")
+			os.Exit(1)
+			return nil
+		}
+
+		s := spinner.New(spinner.CharSets[14], 100*1000*1000)
+		s.Suffix = " Loading linked issues..."
+		s.Start()
+
+		data, err := httpclient.Get(fmt.Sprintf("/repos/%s/pulls/%s/issues", repo, number))
+		s.Stop()
+
+		if err != nil {
+			fmt.Fprintf(os.Stderr, "Failed to list linked issues: %v\n", err)
+			os.Exit(1)
+			return nil
+		}
+
+		printJSON(data)
+		return nil
+	},
+}
+
+var prLinkIssueCmd = &cobra.Command{
+	Use:   "link-issue <number>",
+	Short: "Link issue to PR",
+	Long:  `Link an issue to a pull request.`,
+	Args:  cobra.ExactArgs(1),
+	RunE: func(cmd *cobra.Command, args []string) error {
+		repo, _ := cmd.Flags().GetString("repo")
+		number := args[0]
+		issueNumber, _ := cmd.Flags().GetString("issue")
+
+		if repo == "" {
+			fmt.Fprintln(os.Stderr, "Repository required. Use -R owner/repo")
+			os.Exit(1)
+			return nil
+		}
+
+		if issueNumber == "" {
+			fmt.Fprintln(os.Stderr, "Issue number required. Use --issue")
+			os.Exit(1)
+			return nil
+		}
+
+		s := spinner.New(spinner.CharSets[14], 100*1000*1000)
+		s.Suffix = " Linking issue..."
+		s.Start()
+
+		reqBody := map[string]string{"issue_number": issueNumber}
+		data, err := httpclient.Post(fmt.Sprintf("/repos/%s/pulls/%s/linked-issues", repo, number), reqBody)
+		s.Stop()
+
+		if err != nil {
+			fmt.Fprintf(os.Stderr, "Failed to link issue: %v\n", err)
+			os.Exit(1)
+			return nil
+		}
+
+		printJSON(data)
+		return nil
+	},
+}
+
+var prUnlinkIssueCmd = &cobra.Command{
+	Use:   "unlink-issue <number>",
+	Short: "Unlink issue from PR",
+	Long:  `Unlink an issue from a pull request.`,
+	Args:  cobra.ExactArgs(1),
+	RunE: func(cmd *cobra.Command, args []string) error {
+		repo, _ := cmd.Flags().GetString("repo")
+		number := args[0]
+		issueNumber, _ := cmd.Flags().GetString("issue")
+
+		if repo == "" {
+			fmt.Fprintln(os.Stderr, "Repository required. Use -R owner/repo")
+			os.Exit(1)
+			return nil
+		}
+
+		if issueNumber == "" {
+			fmt.Fprintln(os.Stderr, "Issue number required. Use --issue")
+			os.Exit(1)
+			return nil
+		}
+
+		s := spinner.New(spinner.CharSets[14], 100*1000*1000)
+		s.Suffix = " Unlinking issue..."
+		s.Start()
+
+		err := httpclient.Delete(fmt.Sprintf("/repos/%s/pulls/%s/issues/%s", repo, number, issueNumber))
+		s.Stop()
+
+		if err != nil {
+			fmt.Fprintf(os.Stderr, "Failed to unlink issue: %v\n", err)
+			os.Exit(1)
+			return nil
+		}
+
+		fmt.Println("Issue unlinked successfully")
+		return nil
+	},
+}
+
+var prCloseCmd = &cobra.Command{
+	Use:   "close <number>",
+	Short: "Close a pull request",
+	Long:  `Close a pull request.`,
+	Args:  cobra.ExactArgs(1),
+	RunE: func(cmd *cobra.Command, args []string) error {
+		repo, _ := cmd.Flags().GetString("repo")
+		number := args[0]
+
+		if repo == "" {
+			fmt.Fprintln(os.Stderr, "Repository required. Use -R owner/repo")
+			os.Exit(1)
+			return nil
+		}
+
+		s := spinner.New(spinner.CharSets[14], 100*1000*1000)
+		s.Suffix = " Closing pull request..."
+		s.Start()
+
+		reqBody := map[string]string{"state": "closed"}
+		data, err := httpclient.Patch(fmt.Sprintf("/repos/%s/pulls/%s", repo, number), reqBody)
+		s.Stop()
+
+		if err != nil {
+			fmt.Fprintf(os.Stderr, "Failed to close pull request: %v\n", err)
+			os.Exit(1)
+			return nil
+		}
+
+		printJSON(data)
+		return nil
+	},
+}
+
+var prReopenCmd = &cobra.Command{
+	Use:   "reopen <number>",
+	Short: "Reopen a pull request",
+	Long:  `Reopen a closed pull request.`,
+	Args:  cobra.ExactArgs(1),
+	RunE: func(cmd *cobra.Command, args []string) error {
+		repo, _ := cmd.Flags().GetString("repo")
+		number := args[0]
+
+		if repo == "" {
+			fmt.Fprintln(os.Stderr, "Repository required. Use -R owner/repo")
+			os.Exit(1)
+			return nil
+		}
+
+		s := spinner.New(spinner.CharSets[14], 100*1000*1000)
+		s.Suffix = " Reopening pull request..."
+		s.Start()
+
+		reqBody := map[string]string{"state": "open"}
+		data, err := httpclient.Patch(fmt.Sprintf("/repos/%s/pulls/%s", repo, number), reqBody)
+		s.Stop()
+
+		if err != nil {
+			fmt.Fprintf(os.Stderr, "Failed to reopen pull request: %v\n", err)
+			os.Exit(1)
+			return nil
+		}
+
+		printJSON(data)
+		return nil
+	},
+}
+
 var prCommitsCmd = &cobra.Command{
 	Use:   "commits <number>",
 	Short: "List PR commits",
@@ -587,6 +1008,12 @@ var prCreateCmd = &cobra.Command{
 }
 
 func init() {
+	prListCmd.Flags().StringP("repo", "R", "", "Select repository (OWNER/REPO)")
+	prListCmd.Flags().StringP("state", "s", "open", "Filter by state: open, closed, all")
+	prListCmd.Flags().StringP("limit", "L", "30", "Maximum number of PRs to list")
+
+	prViewCmd.Flags().StringP("repo", "R", "", "Select repository (OWNER/REPO)")
+
 	prCommentsCmd.Flags().StringP("repo", "R", "", "Select repository (OWNER/REPO)")
 
 	prLabelsCmd.Flags().StringP("repo", "R", "", "Select repository (OWNER/REPO)")
@@ -600,6 +1027,29 @@ func init() {
 	prAddAssigneesCmd.Flags().StringArrayP("assignee", "a", []string{}, "Assignee username (can specify multiple)")
 	prRemoveAssigneesCmd.Flags().StringP("repo", "R", "", "Select repository (OWNER/REPO)")
 	prRemoveAssigneesCmd.Flags().StringArrayP("assignee", "a", []string{}, "Assignee username (can specify multiple)")
+
+	prReviewersCmd.Flags().StringP("repo", "R", "", "Select repository (OWNER/REPO)")
+	prAddReviewersCmd.Flags().StringP("repo", "R", "", "Select repository (OWNER/REPO)")
+	prAddReviewersCmd.Flags().StringArrayP("reviewer", "r", []string{}, "Reviewer username (can specify multiple)")
+	prRemoveReviewersCmd.Flags().StringP("repo", "R", "", "Select repository (OWNER/REPO)")
+	prRemoveReviewersCmd.Flags().StringArrayP("reviewer", "r", []string{}, "Reviewer username (can specify multiple)")
+
+	prOperateLogsCmd.Flags().StringP("repo", "R", "", "Select repository (OWNER/REPO)")
+
+	prTestersCmd.Flags().StringP("repo", "R", "", "Select repository (OWNER/REPO)")
+	prAddTestersCmd.Flags().StringP("repo", "R", "", "Select repository (OWNER/REPO)")
+	prAddTestersCmd.Flags().StringArrayP("tester", "t", []string{}, "Tester username (can specify multiple)")
+	prRemoveTestersCmd.Flags().StringP("repo", "R", "", "Select repository (OWNER/REPO)")
+	prRemoveTestersCmd.Flags().StringArrayP("tester", "t", []string{}, "Tester username (can specify multiple)")
+
+	prLinkedIssuesCmd.Flags().StringP("repo", "R", "", "Select repository (OWNER/REPO)")
+	prLinkIssueCmd.Flags().StringP("repo", "R", "", "Select repository (OWNER/REPO)")
+	prLinkIssueCmd.Flags().StringP("issue", "i", "", "Issue number to link")
+	prUnlinkIssueCmd.Flags().StringP("repo", "R", "", "Select repository (OWNER/REPO)")
+	prUnlinkIssueCmd.Flags().StringP("issue", "i", "", "Issue number to unlink")
+
+	prCloseCmd.Flags().StringP("repo", "R", "", "Select repository (OWNER/REPO)")
+	prReopenCmd.Flags().StringP("repo", "R", "", "Select repository (OWNER/REPO)")
 
 	prCommitsCmd.Flags().StringP("repo", "R", "", "Select repository (OWNER/REPO)")
 	prFilesCmd.Flags().StringP("repo", "R", "", "Select repository (OWNER/REPO)")
@@ -631,6 +1081,18 @@ func init() {
 	prCmd.AddCommand(prAssigneesCmd)
 	prCmd.AddCommand(prAddAssigneesCmd)
 	prCmd.AddCommand(prRemoveAssigneesCmd)
+	prCmd.AddCommand(prReviewersCmd)
+	prCmd.AddCommand(prAddReviewersCmd)
+	prCmd.AddCommand(prRemoveReviewersCmd)
+	prCmd.AddCommand(prOperateLogsCmd)
+	prCmd.AddCommand(prTestersCmd)
+	prCmd.AddCommand(prAddTestersCmd)
+	prCmd.AddCommand(prRemoveTestersCmd)
+	prCmd.AddCommand(prLinkedIssuesCmd)
+	prCmd.AddCommand(prLinkIssueCmd)
+	prCmd.AddCommand(prUnlinkIssueCmd)
+	prCmd.AddCommand(prCloseCmd)
+	prCmd.AddCommand(prReopenCmd)
 	prCmd.AddCommand(prCommitsCmd)
 	prCmd.AddCommand(prFilesCmd)
 	prCmd.AddCommand(prMergeCmd)

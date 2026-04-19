@@ -126,6 +126,20 @@ func Delete(path string) error {
 	return nil
 }
 
+func DeleteWithBody(path string, body interface{}) error {
+	resp, err := Request(path, HttpOptions{Method: "DELETE", Body: body})
+	if err != nil {
+		return err
+	}
+	defer resp.Body.Close()
+
+	if resp.StatusCode != 204 && (resp.StatusCode < 200 || resp.StatusCode >= 300) {
+		respBody, _ := io.ReadAll(resp.Body)
+		return fmt.Errorf("HTTP %d: %s\n%s", resp.StatusCode, resp.Status, string(respBody))
+	}
+	return nil
+}
+
 func Patch(path string, body interface{}) (interface{}, error) {
 	resp, err := Request(path, HttpOptions{Method: "PATCH", Body: body})
 	if err != nil {
