@@ -2,7 +2,7 @@
 
 ## 1. 项目概述
 
-**项目名称:** atomgit-cli (amg)
+**项目名称:** atomgit-cli
 **项目类型:** 命令行工具 (Go)
 **核心功能:** GitHub-like CLI for AtomGit platform
 **目标用户:** 开发者
