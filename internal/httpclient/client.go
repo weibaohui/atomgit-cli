@@ -145,3 +145,23 @@ func Patch(path string, body interface{}) (interface{}, error) {
 	}
 	return result, nil
 }
+
+func Put(path string, body interface{}) (interface{}, error) {
+	resp, err := Request(path, HttpOptions{Method: "PUT", Body: body})
+	if err != nil {
+		return nil, err
+	}
+	defer resp.Body.Close()
+
+	if resp.StatusCode < 200 || resp.StatusCode >= 300 {
+		respBody, _ := io.ReadAll(resp.Body)
+		return nil, fmt.Errorf("HTTP %d: %s\n%s", resp.StatusCode, resp.Status, string(respBody))
+	}
+
+	var result interface{}
+	if err := json.NewDecoder(resp.Body).Decode(&result); err != nil {
+		respBody, _ := io.ReadAll(resp.Body)
+		return string(respBody), nil
+	}
+	return result, nil
+}

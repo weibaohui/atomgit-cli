@@ -84,14 +84,24 @@ atomgit pr view <number> -R <owner/repo>                   # 查看PR
 ### 5. branch - 分支
 
 ```bash
-atomgit branch list -R <owner/repo>   # 列出分支
-atomgit branch view <branch> -R <owner/repo>  # 查看分支
+atomgit branch list -R <owner/repo>              # 列出分支
+atomgit branch view <branch> -R <owner/repo>    # 查看分支
+atomgit branch create <branch> -R <owner/repo> [--sha <sha>]   # 创建分支
+atomgit branch delete <branch> -R <owner/repo>  # 删除分支
+atomgit branch protect <branch> -R <owner/repo>  # 保护分支
+atomgit branch unprotect <branch> -R <owner/repo>  # 取消保护
+atomgit branch protected-list -R <owner/repo>    # 列出保护分支
 ```
 
 | 子命令 | 说明 | API端点 |
 |--------|------|---------|
 | list | 列出分支 | GET /repos/{owner}/{repo}/branches |
 | view | 查看分支详情 | GET /repos/{owner}/{repo}/branches/{branch} |
+| create | 创建分支 | POST /repos/{owner}/{repo}/branches |
+| delete | 删除分支 | DELETE /repos/{owner}/{repo}/branches/{branch} |
+| protect | 保护分支 | PUT /repos/{owner}/{repo}/branches/{branch}/setting |
+| unprotect | 取消保护 | DELETE /repos/{owner}/{repo}/branches/{branch}/setting |
+| protected-list | 列出保护分支 | GET /repos/{owner}/{repo}/protect-branches |
 
 ---
 
