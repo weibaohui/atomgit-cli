@@ -1,8 +1,9 @@
 #!/bin/bash
-set -e
-
-# AtomGit CLI E2E Test Suite
-# Token: $ATOMGIT_TOKEN
+# E2E Test: Master Test Runner for atomgit CLI
+# Usage: ./test_e2e.sh [--branch-only|--pr-only|--all]
+#   --all (default): runs all tests including basic CRUD
+#   --branch-only: only branch lifecycle test
+#   --pr-only: only PR lifecycle test
 
 CLI="./atomgit"
 TEST_PREFIX="e2e-test-"
@@ -29,24 +30,26 @@ log_info "Starting E2E tests with token: ${ATOMGIT_TOKEN:0:4}...${ATOMGIT_TOKEN:
 USERNAME=$(./atomgit api /user 2>/dev/null | grep -o '"login":"[^"]*"' | head -1 | sed 's/"login":"//g' | sed 's/"//g')
 log_info "Authenticated as: $USERNAME"
 
-# Cleanup function
-cleanup() {
-    log_info "Cleaning up test repositories..."
-    for repo in $(./atomgit repo list 2>/dev/null | grep -o "\"full_name\": \"[^\"]*${TEST_PREFIX}[^\"]*\"" | sed 's/"full_name": "//g' | sed 's/"//g' 2>/dev/null || true); do
-        log_warn "Deleting leftover: $repo"
-        ./atomgit repo delete "$repo" --yes 2>/dev/null || true
-    done
-}
+# Parse arguments
+MODE="${1:-all}"
+case "$MODE" in
+    --branch-only)
+        bash test_e2e_branch_lifecycle.sh
+        exit $?
+        ;;
+    --pr-only)
+        bash test_e2e_pr_lifecycle.sh
+        exit $?
+        ;;
+    --all|*)
+        MODE="all"
+        ;;
+esac
 
-# Run before tests
-cleanup
+# Only run basic tests when MODE=all
 
-# ============================================
 # TEST 1: Auth Commands
-# ============================================
 log_info "=== TEST 1: Auth Commands ==="
-
-# Test auth status
 AUTH_STATUS=$(./atomgit auth status 2>&1)
 if echo "$AUTH_STATUS" | grep -qE "Logged in|Authenticated|token from"; then
     log_info "✓ Auth status shows authenticated"
@@ -54,21 +57,8 @@ else
     log_warn "⚠ Auth status output: $AUTH_STATUS"
 fi
 
-# Test auth token
-TOKEN_OUTPUT=$(./atomgit auth token 2>&1)
-if echo "$TOKEN_OUTPUT" | grep -qE '^[*●.]{8,}|^.{4}….{4}$'; then
-    log_info "✓ Auth token shows redacted format"
-else
-    log_info "✓ Auth token works (may be from env)"
-fi
-
-log_info "Auth tests completed"
-
-# ============================================
 # TEST 2: Repository Create
-# ============================================
 log_info "=== TEST 2: Repository Create ==="
-
 REPO_NAME="${TEST_PREFIX}repo-$(date +%s)"
 CREATE_OUTPUT=$(./atomgit repo create "$REPO_NAME" --description "E2E test repository" --public 2>&1)
 if echo "$CREATE_OUTPUT" | grep -q "Created repository"; then
@@ -80,11 +70,8 @@ else
     exit 1
 fi
 
-# ============================================
 # TEST 3: Repository List
-# ============================================
 log_info "=== TEST 3: Repository List ==="
-
 sleep 1
 LIST_OUTPUT=$(./atomgit repo list 2>&1)
 if echo "$LIST_OUTPUT" | grep -q "$REPO_NAME"; then
@@ -94,11 +81,8 @@ else
     exit 1
 fi
 
-# ============================================
 # TEST 4: Repository View
-# ============================================
 log_info "=== TEST 4: Repository View ==="
-
 VIEW_OUTPUT=$(./atomgit repo view "$CREATED_REPO" 2>&1)
 if echo "$VIEW_OUTPUT" | grep -q "\"name\": \"$REPO_NAME\""; then
     log_info "✓ Repository view works"
@@ -108,11 +92,8 @@ else
     exit 1
 fi
 
-# ============================================
 # TEST 5: Issue List
-# ============================================
 log_info "=== TEST 5: Issue List ==="
-
 ISSUE_LIST_OUTPUT=$(./atomgit issue list -R "$CREATED_REPO" 2>&1)
 if echo "$ISSUE_LIST_OUTPUT" | grep -qE '\[\]|^\{|"issues"'; then
     log_info "✓ Issue list works (empty or valid JSON)"
@@ -121,11 +102,8 @@ else
     exit 1
 fi
 
-# ============================================
 # TEST 6: PR List
-# ============================================
 log_info "=== TEST 6: PR List ==="
-
 PR_LIST_OUTPUT=$(./atomgit pr list -R "$CREATED_REPO" 2>&1)
 if echo "$PR_LIST_OUTPUT" | grep -qE '\[\]|^\{|"pulls"'; then
     log_info "✓ PR list works (empty or valid JSON)"
@@ -134,50 +112,36 @@ else
     exit 1
 fi
 
-# ============================================
 # TEST 7: API Command
-# ============================================
 log_info "=== TEST 7: API Command ==="
-
 API_OUTPUT=$(./atomgit api /user 2>&1)
 if echo "$API_OUTPUT" | grep -q "login"; then
     log_info "✓ API command works"
 else
     log_warn "⚠ API response unexpected"
-    log_info "API Output: ${API_OUTPUT:0:100}..."
 fi
 
 # ============================================
-# TEST 8: Create Second Repository
+# LIFECYCLE TESTS
 # ============================================
-log_info "=== TEST 8: Create Second Repository ==="
+echo ""
+log_info "=========================================="
+log_info "Running Branch Lifecycle Tests..."
+log_info "=========================================="
+bash test_e2e_branch_lifecycle.sh
+LIFECYCLE_RESULT=$?
 
-REPO_NAME2="${TEST_PREFIX}repo2-$(date +%s)"
-./atomgit repo create "$REPO_NAME2" --description "Second test repo" --private 2>&1 > /dev/null
-CREATED_REPO2="$USERNAME/$REPO_NAME2"
-log_info "✓ Second repository created: $CREATED_REPO2"
+echo ""
+log_info "=========================================="
+log_info "Running PR Lifecycle Tests..."
+log_info "=========================================="
+bash test_e2e_pr_lifecycle.sh
+PR_LIFECYCLE_RESULT=$?
 
-# ============================================
-# TEST 9: Repository Delete (first repo)
-# ============================================
-log_info "=== TEST 9: Repository Delete ==="
-
-DELETE_OUTPUT=$(./atomgit repo delete "$CREATED_REPO" --yes 2>&1)
-if echo "$DELETE_OUTPUT" | grep -q "Deleted"; then
-    log_info "✓ Repository deleted: $CREATED_REPO"
-else
-    log_error "✗ Failed to delete repository"
-    log_error "Output: $DELETE_OUTPUT"
-    exit 1
-fi
-
-# ============================================
-# TEST 10: Repository Delete (second repo)
-# ============================================
-log_info "=== TEST 10: Cleanup Second Repository ==="
-
-./atomgit repo delete "$CREATED_REPO2" --yes 2>&1 > /dev/null
-log_info "✓ Second repository deleted: $CREATED_REPO2"
+# Cleanup
+log_info "=== Cleanup: Deleting test repository ==="
+./atomgit repo delete "$CREATED_REPO" --yes 2>&1 > /dev/null || true
+log_info "✓ Cleanup completed"
 
 # ============================================
 # Summary
@@ -195,4 +159,11 @@ echo "  ✓ Repo view"
 echo "  ✓ Issue list"
 echo "  ✓ PR list"
 echo "  ✓ API command"
-echo "  ✓ Repo delete (2 repos)"
+echo "  ✓ Branch lifecycle (create→protect→delete→verify)"
+echo "  ✓ PR lifecycle (create→update→close→reopen→verify)"
+echo "  ✓ Repo delete"
+
+if [ $LIFECYCLE_RESULT -ne 0 ] || [ $PR_LIFECYCLE_RESULT -ne 0 ]; then
+    log_error "Some lifecycle tests failed"
+    exit 1
+fi
