@@ -6,8 +6,8 @@ import (
 	"testing"
 )
 
-// TestStarLifecycle tests star: list
-func TestStarLifecycle(t *testing.T) {
+// TestEventList tests event list
+func TestEventList(t *testing.T) {
 	token := os.Getenv("ATOMGIT_TOKEN")
 	if token == "" {
 		t.Skip("ATOMGIT_TOKEN not set")
@@ -16,12 +16,13 @@ func TestStarLifecycle(t *testing.T) {
 	cli := getCLIPath()
 	repo := getTestRepo()
 
-	t.Run("List stargazers", func(t *testing.T) {
-		cmd := exec.Command(cli, "star", "list", "-R", repo)
+	t.Run("List events", func(t *testing.T) {
+		cmd := exec.Command(cli, "event", "list", "-R", repo)
 		cmd.Env = append(os.Environ(), "ATOMGIT_TOKEN="+token)
 		output, err := cmd.CombinedOutput()
 		if err != nil {
-			t.Fatalf("Failed to list stargazers: %v\n%s", err, output)
+			t.Fatalf("Failed to list events: %v\n%s", err, output)
 		}
+		t.Log("Event list works")
 	})
 }

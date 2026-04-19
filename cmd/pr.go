@@ -3,6 +3,7 @@ package cmd
 import (
 	"fmt"
 	"os"
+	"strings"
 
 	"github.com/weibaohui/atomgit-cli/internal/httpclient"
 
@@ -37,6 +38,11 @@ var prListCmd = &cobra.Command{
 		repo, _ := cmd.Flags().GetString("repo")
 		state, _ := cmd.Flags().GetString("state")
 		limit, _ := cmd.Flags().GetString("limit")
+		labels, _ := cmd.Flags().GetString("label")
+		assignee, _ := cmd.Flags().GetString("assignee")
+		author, _ := cmd.Flags().GetString("author")
+		draft, _ := cmd.Flags().GetBool("draft")
+		search, _ := cmd.Flags().GetString("search")
 
 		if repo == "" {
 			fmt.Fprintln(os.Stderr, "Repository required. Use -R owner/repo")
@@ -48,7 +54,24 @@ var prListCmd = &cobra.Command{
 		s.Suffix = " Loading pull requests..."
 		s.Start()
 
-		data, err := httpclient.Get(fmt.Sprintf("/repos/%s/pulls?state=%s&limit=%s", repo, state, limit))
+		url := fmt.Sprintf("/repos/%s/pulls?state=%s&limit=%s", repo, state, limit)
+		if labels != "" {
+			url += "&labels=" + labels
+		}
+		if assignee != "" {
+			url += "&assignee=" + assignee
+		}
+		if author != "" {
+			url += "&author=" + author
+		}
+		if draft {
+			url += "&is_draft=true"
+		}
+		if search != "" {
+			url += "&search=" + search
+		}
+
+		data, err := httpclient.Get(url)
 		s.Stop()
 
 		if err != nil {
@@ -70,6 +93,8 @@ var prViewCmd = &cobra.Command{
 	RunE: func(cmd *cobra.Command, args []string) error {
 		repo, _ := cmd.Flags().GetString("repo")
 		number := args[0]
+		comments, _ := cmd.Flags().GetBool("comments")
+		web, _ := cmd.Flags().GetBool("web")
 
 		if repo == "" {
 			fmt.Fprintln(os.Stderr, "Repository required. Use -R owner/repo")
@@ -88,6 +113,29 @@ var prViewCmd = &cobra.Command{
 			fmt.Fprintf(os.Stderr, "Failed to view pull request: %v\n", err)
 			os.Exit(1)
 			return nil
+		}
+
+		if web {
+			if m, ok := data.(map[string]interface{}); ok {
+				if htmlURL, ok := m["html_url"].(string); ok {
+					fmt.Printf("Opening in browser: %s\n", htmlURL)
+				}
+			}
+		}
+
+		if comments {
+			s2 := spinner.New(spinner.CharSets[14], 100*1000*1000)
+			s2.Suffix = " Loading comments..."
+			s2.Start()
+			commentsData, err := httpclient.Get(fmt.Sprintf("/repos/%s/pulls/%s/comments", repo, number))
+			s2.Stop()
+			if err != nil {
+				fmt.Fprintf(os.Stderr, "Failed to load comments: %v\n", err)
+			} else {
+				if m, ok := data.(map[string]interface{}); ok {
+					m["comments"] = commentsData
+				}
+			}
 		}
 
 		printJSON(data)
@@ -973,8 +1021,16 @@ var prCreateCmd = &cobra.Command{
 		repo, _ := cmd.Flags().GetString("repo")
 		title, _ := cmd.Flags().GetString("title")
 		body, _ := cmd.Flags().GetString("body")
+		bodyFile, _ := cmd.Flags().GetString("body-file")
 		head, _ := cmd.Flags().GetString("head")
 		base, _ := cmd.Flags().GetString("base")
+		draft, _ := cmd.Flags().GetBool("draft")
+		fill, _ := cmd.Flags().GetBool("fill")
+		assigneesStr, _ := cmd.Flags().GetString("assignee")
+		reviewersStr, _ := cmd.Flags().GetString("reviewer")
+		labelsStr, _ := cmd.Flags().GetString("label")
+		milestone, _ := cmd.Flags().GetString("milestone")
+		web, _ := cmd.Flags().GetBool("web")
 
 		if repo == "" {
 			fmt.Fprintln(os.Stderr, "Repository required. Use -R owner/repo")
@@ -982,17 +1038,28 @@ var prCreateCmd = &cobra.Command{
 			return nil
 		}
 
-		if title == "" {
+		if title == "" && !fill {
 			fmt.Fprintln(os.Stderr, "Title required. Use --title")
 			os.Exit(1)
 			return nil
+		}
+
+		// Read body from file if specified
+		if bodyFile != "" {
+			content, err := os.ReadFile(bodyFile)
+			if err != nil {
+				fmt.Fprintf(os.Stderr, "Failed to read body file: %v\n", err)
+				os.Exit(1)
+				return nil
+			}
+			body = string(content)
 		}
 
 		s := spinner.New(spinner.CharSets[14], 100*1000*1000)
 		s.Suffix = " Creating pull request..."
 		s.Start()
 
-		reqBody := map[string]string{
+		reqBody := map[string]interface{}{
 			"title": title,
 		}
 		if body != "" {
@@ -1004,6 +1071,24 @@ var prCreateCmd = &cobra.Command{
 		if base != "" {
 			reqBody["base"] = base
 		}
+		if draft {
+			reqBody["draft"] = true
+		}
+		if fill {
+			reqBody["fill"] = true
+		}
+		if assigneesStr != "" {
+			reqBody["assignees"] = strings.Split(assigneesStr, ",")
+		}
+		if reviewersStr != "" {
+			reqBody["reviewers"] = strings.Split(reviewersStr, ",")
+		}
+		if labelsStr != "" {
+			reqBody["labels"] = strings.Split(labelsStr, ",")
+		}
+		if milestone != "" {
+			reqBody["milestone"] = milestone
+		}
 
 		data, err := httpclient.Post(fmt.Sprintf("/repos/%s/pulls", repo), reqBody)
 		s.Stop()
@@ -1012,6 +1097,14 @@ var prCreateCmd = &cobra.Command{
 			fmt.Fprintf(os.Stderr, "Failed to create pull request: %v\n", err)
 			os.Exit(1)
 			return nil
+		}
+
+		if web {
+			if m, ok := data.(map[string]interface{}); ok {
+				if htmlURL, ok := m["html_url"].(string); ok {
+					fmt.Printf("Pull request created! Open in browser: %s\n", htmlURL)
+				}
+			}
 		}
 
 		printJSON(data)
@@ -1023,8 +1116,15 @@ func init() {
 	prListCmd.Flags().StringP("repo", "R", "", "Select repository (OWNER/REPO)")
 	prListCmd.Flags().StringP("state", "s", "open", "Filter by state: open, closed, all")
 	prListCmd.Flags().StringP("limit", "L", "30", "Maximum number of PRs to list")
+	prListCmd.Flags().StringP("label", "l", "", "Filter by labels (comma-separated)")
+	prListCmd.Flags().StringP("assignee", "a", "", "Filter by assignee")
+	prListCmd.Flags().StringP("author", "A", "", "Filter by author")
+	prListCmd.Flags().BoolP("draft", "d", false, "Filter by draft state")
+	prListCmd.Flags().StringP("search", "S", "", "Search PRs by title/body")
 
 	prViewCmd.Flags().StringP("repo", "R", "", "Select repository (OWNER/REPO)")
+	prViewCmd.Flags().BoolP("comments", "c", false, "Show comments")
+	prViewCmd.Flags().BoolP("web", "w", false, "Open in browser")
 
 	prCommentsCmd.Flags().StringP("repo", "R", "", "Select repository (OWNER/REPO)")
 
@@ -1076,8 +1176,16 @@ func init() {
 	prCreateCmd.Flags().StringP("repo", "R", "", "Select repository (OWNER/REPO)")
 	prCreateCmd.Flags().StringP("title", "t", "", "Pull request title (required)")
 	prCreateCmd.Flags().StringP("body", "m", "", "Pull request body/description")
+	prCreateCmd.Flags().String("body-file", "", "Read body from file")
 	prCreateCmd.Flags().StringP("head", "", "", "Source branch")
 	prCreateCmd.Flags().StringP("base", "b", "main", "Target branch")
+	prCreateCmd.Flags().BoolP("draft", "d", false, "Create as draft")
+	prCreateCmd.Flags().BoolP("fill", "f", false, "Auto-fill from commits (title from first commit, body from description)")
+	prCreateCmd.Flags().StringP("assignee", "a", "", "Assignee username(s), comma-separated")
+	prCreateCmd.Flags().StringP("reviewer", "r", "", "Reviewer username(s), comma-separated")
+	prCreateCmd.Flags().StringP("label", "l", "", "Labels, comma-separated")
+	prCreateCmd.Flags().String("milestone", "", "Milestone title or number")
+	prCreateCmd.Flags().BoolP("web", "w", false, "Open in browser")
 
 	prUpdateCmd.Flags().StringP("repo", "R", "", "Select repository (OWNER/REPO)")
 	prUpdateCmd.Flags().StringP("title", "t", "", "Pull request title")

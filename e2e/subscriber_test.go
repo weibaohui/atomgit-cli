@@ -6,8 +6,8 @@ import (
 	"testing"
 )
 
-// TestTagLifecycle tests tag: list
-func TestTagLifecycle(t *testing.T) {
+// TestSubscriberList tests subscriber list
+func TestSubscriberList(t *testing.T) {
 	token := os.Getenv("ATOMGIT_TOKEN")
 	if token == "" {
 		t.Skip("ATOMGIT_TOKEN not set")
@@ -16,12 +16,13 @@ func TestTagLifecycle(t *testing.T) {
 	cli := getCLIPath()
 	repo := getTestRepo()
 
-	t.Run("List tags", func(t *testing.T) {
-		cmd := exec.Command(cli, "tag", "list", "-R", repo)
+	t.Run("List subscribers", func(t *testing.T) {
+		cmd := exec.Command(cli, "subscriber", "list", "-R", repo)
 		cmd.Env = append(os.Environ(), "ATOMGIT_TOKEN="+token)
 		output, err := cmd.CombinedOutput()
 		if err != nil {
-			t.Fatalf("Failed to list tags: %v\n%s", err, output)
+			t.Fatalf("Failed to list subscribers: %v\n%s", err, output)
 		}
+		t.Log("Subscriber list works")
 	})
 }

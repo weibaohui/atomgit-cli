@@ -6,8 +6,8 @@ import (
 	"testing"
 )
 
-// TestForkLifecycle tests fork: list
-func TestForkLifecycle(t *testing.T) {
+// TestForkList tests fork list
+func TestForkList(t *testing.T) {
 	token := os.Getenv("ATOMGIT_TOKEN")
 	if token == "" {
 		t.Skip("ATOMGIT_TOKEN not set")
@@ -23,5 +23,6 @@ func TestForkLifecycle(t *testing.T) {
 		if err != nil {
 			t.Fatalf("Failed to list forks: %v\n%s", err, output)
 		}
+		t.Log("Fork list works")
 	})
 }

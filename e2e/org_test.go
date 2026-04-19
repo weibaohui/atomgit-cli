@@ -7,8 +7,8 @@ import (
 	"testing"
 )
 
-// TestOrgLifecycle tests org: info -> members
-func TestOrgLifecycle(t *testing.T) {
+// TestOrgInfoAndMembers tests org info and members list
+func TestOrgInfoAndMembers(t *testing.T) {
 	token := os.Getenv("ATOMGIT_TOKEN")
 	if token == "" {
 		t.Skip("ATOMGIT_TOKEN not set")
@@ -27,6 +27,7 @@ func TestOrgLifecycle(t *testing.T) {
 		if err != nil {
 			t.Fatalf("Failed to get org info: %v\n%s", err, output)
 		}
+		t.Log("Org info works")
 	})
 
 	t.Run("List org members", func(t *testing.T) {
@@ -39,5 +40,6 @@ func TestOrgLifecycle(t *testing.T) {
 		if err != nil {
 			t.Fatalf("Failed to list org members: %v\n%s", err, output)
 		}
+		t.Log("Org members list works")
 	})
 }

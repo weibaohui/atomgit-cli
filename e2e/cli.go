@@ -53,3 +53,41 @@ func EnsureTestRepo(owner, reponame string) error {
 	}
 	return nil
 }
+
+// getTestRepo returns the test repository from env or default
+func getTestRepo() string {
+	if repo := os.Getenv("ATOMGIT_TEST_REPO"); repo != "" {
+		return repo
+	}
+	return "weibaohui/atomgit-cli-e2e-test"
+}
+
+// Helper function to extract SHA from commit list output
+func extractSHA(output string) string {
+	parts := strings.Split(output, `"sha":"`)
+	if len(parts) < 2 {
+		return ""
+	}
+	sha := parts[1]
+	for i, c := range sha {
+		if c == '"' {
+			return sha[:i]
+		}
+	}
+	return ""
+}
+
+// extractNumber extracts a number from JSON response
+func extractNumber(s string) string {
+	parts := strings.Split(s, `"number":`)
+	if len(parts) < 2 {
+		return ""
+	}
+	numStr := strings.TrimSpace(parts[1])
+	for i, c := range numStr {
+		if c < '0' || c > '9' {
+			return numStr[:i]
+		}
+	}
+	return numStr
+}

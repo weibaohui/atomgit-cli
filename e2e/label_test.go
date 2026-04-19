@@ -6,8 +6,8 @@ import (
 	"testing"
 )
 
-// TestReleaseLifecycle tests release: list -> view
-func TestReleaseLifecycle(t *testing.T) {
+// TestLabelList tests label list
+func TestLabelList(t *testing.T) {
 	token := os.Getenv("ATOMGIT_TOKEN")
 	if token == "" {
 		t.Skip("ATOMGIT_TOKEN not set")
@@ -16,12 +16,13 @@ func TestReleaseLifecycle(t *testing.T) {
 	cli := getCLIPath()
 	repo := getTestRepo()
 
-	t.Run("List releases", func(t *testing.T) {
-		cmd := exec.Command(cli, "release", "list", "-R", repo)
+	t.Run("List labels", func(t *testing.T) {
+		cmd := exec.Command(cli, "label", "list", "-R", repo)
 		cmd.Env = append(os.Environ(), "ATOMGIT_TOKEN="+token)
 		output, err := cmd.CombinedOutput()
 		if err != nil {
-			t.Fatalf("Failed to list releases: %v\n%s", err, output)
+			t.Fatalf("Failed to list labels: %v\n%s", err, output)
 		}
+		t.Log("Label list works")
 	})
 }

@@ -3,12 +3,11 @@ package e2e
 import (
 	"os"
 	"os/exec"
-	"strings"
 	"testing"
 )
 
-// TestCommitLifecycle tests commit: list -> view
-func TestCommitLifecycle(t *testing.T) {
+// TestCommitListAndView tests commit list -> view
+func TestCommitListAndView(t *testing.T) {
 	token := os.Getenv("ATOMGIT_TOKEN")
 	if token == "" {
 		t.Skip("ATOMGIT_TOKEN not set")
@@ -23,6 +22,9 @@ func TestCommitLifecycle(t *testing.T) {
 		output, err := cmd.CombinedOutput()
 		if err != nil {
 			t.Fatalf("Failed to list commits: %v\n%s", err, output)
+		}
+		if contains(string(output), "sha") {
+			t.Log("Commit list works")
 		}
 	})
 
@@ -43,20 +45,6 @@ func TestCommitLifecycle(t *testing.T) {
 		if err != nil {
 			t.Fatalf("Failed to view commit: %v\n%s", err, output)
 		}
+		t.Log("Commit view works")
 	})
-}
-
-// extractSHA extracts SHA from commit list output
-func extractSHA(output string) string {
-	parts := strings.Split(output, `"sha":"`)
-	if len(parts) < 2 {
-		return ""
-	}
-	sha := parts[1]
-	for i, c := range sha {
-		if c == '"' {
-			return sha[:i]
-		}
-	}
-	return ""
 }
