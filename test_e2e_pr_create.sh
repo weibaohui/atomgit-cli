@@ -3,7 +3,7 @@
 
 REPO="${1:-$ATOMGIT_TEST_REPO}"
 if [ -z "$REPO" ]; then
-    REPO="weibaohui/atomgit-cli-e2e-test"
+    REPO="weibaohui/atomgit-cli"
 fi
 ATOMGIT_TOKEN="${ATOMGIT_TOKEN:-}"
 CLI="./atomgit"

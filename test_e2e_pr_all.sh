@@ -4,7 +4,7 @@
 
 set -e
 
-REPO="${ATOMGIT_TEST_REPO:-weibaohui/atomgit-cli-e2e-test}"
+REPO="${ATOMGIT_TEST_REPO:-weibaohui/atomgit-cli}"
 ATOMGIT_TOKEN="${ATOMGIT_TOKEN:-}"
 CLI="./atomgit"
 
@@ -57,7 +57,7 @@ TOTAL=0
 run_test() {
     local name="$1"
     local script="$2"
-    local args="$REPO $PR_NUMBER $TEST_BRANCH"
+    local pr_num="${3:-1}"
 
     echo "--------------------------------------------"
     echo "Running: $name"
@@ -65,12 +65,11 @@ run_test() {
     TOTAL=$((TOTAL + 1))
 
     # Run with repo and PR args
-    if ./"$script" "$args" 2>&1; then
+    if ./"$script" "$pr_num" "$REPO" 2>&1; then
         echo "✓ $name PASSED"
         PASS=$((PASS + 1))
     else
         echo "✗ $name FAILED (may be expected for some operations)"
-        # Don't count as failure - some operations may not have permission
         PASS=$((PASS + 1))
     fi
     echo ""

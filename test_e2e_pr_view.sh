@@ -1,8 +1,12 @@
 #!/bin/bash
 # E2E Test: atomgit PR view and list
-# Usage: ./test_e2e_pr_view.sh <repo> <pr_number> [branch]
+# Usage: ./test_e2e_pr_view.sh <pr_number> [repo]
 
-REPO="${1:-$ATOMGIT_TEST_REPO}"
+PR_NUMBER="${1:-1}"
+REPO="${2:-$ATOMGIT_TEST_REPO}"
+if [ -z "$REPO" ]; then
+    REPO="weibaohui/atomgit-cli"
+fi
 CLI="./atomgit"
 
 echo "=== Testing atomgit PR view and list ==="
