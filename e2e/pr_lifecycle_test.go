@@ -14,7 +14,7 @@ import (
 func TestPRLifecycle(t *testing.T) {
 	repo := os.Getenv("ATOMGIT_TEST_REPO")
 	if repo == "" {
-		repo = "weibaohui/atomgit-cli"
+		repo = "weibaohui/atomgit-e2e"
 	}
 
 	cli := getCLIPath()
