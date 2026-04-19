@@ -260,7 +260,29 @@ atomgit subscriber list -R <owner/repo>   # 列出订阅者
 
 ---
 
-### 18. language - 语言
+### 18. hook - Webhook
+
+```bash
+atomgit hook list -R <owner/repo>                    # 列出webhooks
+atomgit hook create -R <owner/repo> --url <url>     # 创建webhook
+atomgit hook view <id> -R <owner/repo>              # 查看webhook
+atomgit hook update <id> -R <owner/repo> --url <url> # 更新webhook
+atomgit hook delete <id> -R <owner/repo>            # 删除webhook
+atomgit hook test <id> -R <owner/repo>              # 测试webhook
+```
+
+| 子命令 | 说明 | API端点 |
+|--------|------|---------|
+| list | 列出webhooks | GET /repos/{owner}/{repo}/hooks |
+| create | 创建webhook | POST /repos/{owner}/{repo}/hooks |
+| view | 查看webhook | GET /repos/{owner}/{repo}/hooks/{id} |
+| update | 更新webhook | PATCH /repos/{owner}/{repo}/hooks/{id} |
+| delete | 删除webhook | DELETE /repos/{owner}/{repo}/hooks/{id} |
+| test | 测试webhook | POST /repos/{owner}/{repo}/hooks/{id}/tests |
+
+---
+
+### 19. language - 语言
 
 ```bash
 atomgit language list -R <owner/repo>   # 列出编程语言
@@ -272,7 +294,7 @@ atomgit language list -R <owner/repo>   # 列出编程语言
 
 ---
 
-### 19. contributor - 贡献者
+### 20. contributor - 贡献者
 
 ```bash
 atomgit contributor list -R <owner/repo>   # 列出贡献者
@@ -286,7 +308,7 @@ atomgit contributor stats -R <owner/repo>    # 贡献者统计
 
 ---
 
-### 20. api - 原始API请求
+### 21. api - 原始API请求
 
 ```bash
 atomgit api <endpoint> [-X <method>] [-d <json>]
