@@ -14,6 +14,10 @@ EXAMPLES
   $ atomgit repo list
   $ atomgit issue list -R owner/repo
   $ atomgit pr list -R owner/repo
+  $ atomgit search repos golang
+  $ atomgit user info
+  $ atomgit branch list -R owner/repo
+  $ atomgit commit list -R owner/repo
   $ atomgit api /api/v1/user
 
 LEARN MORE
@@ -31,4 +35,12 @@ func init() {
 	rootCmd.AddCommand(issueCmd)
 	rootCmd.AddCommand(prCmd)
 	rootCmd.AddCommand(apiCmd)
+	rootCmd.AddCommand(userCmd)
+	rootCmd.AddCommand(branchCmd)
+	rootCmd.AddCommand(commitCmd)
+	rootCmd.AddCommand(searchCmd)
+	rootCmd.AddCommand(labelCmd)
+	rootCmd.AddCommand(eventCmd)
+	rootCmd.AddCommand(milestoneCmd)
+	rootCmd.AddCommand(orgCmd)
 }
