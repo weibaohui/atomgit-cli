@@ -18,6 +18,7 @@ EXAMPLES
   $ atomgit user info
   $ atomgit branch list -R owner/repo
   $ atomgit commit list -R owner/repo
+  $ atomgit release list -R owner/repo
   $ atomgit api /api/v1/user
 
 LEARN MORE
@@ -43,4 +44,11 @@ func init() {
 	rootCmd.AddCommand(eventCmd)
 	rootCmd.AddCommand(milestoneCmd)
 	rootCmd.AddCommand(orgCmd)
+	rootCmd.AddCommand(releaseCmd)
+	rootCmd.AddCommand(tagCmd)
+	rootCmd.AddCommand(forkCmd)
+	rootCmd.AddCommand(starCmd)
+	rootCmd.AddCommand(subscriberCmd)
+	rootCmd.AddCommand(languageCmd)
+	rootCmd.AddCommand(contributorCmd)
 }
