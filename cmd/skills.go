@@ -94,7 +94,7 @@ var skillListCmd = &cobra.Command{
 	Short: "List available skills",
 	RunE: func(cmd *cobra.Command, args []string) error {
 		fmt.Println("Available skills:")
-		fmt.Println("  atomgit-cli    AtomGit CLI 使用指南 (repo, issue, pr)")
+		fmt.Println("  atomgit    AtomGit CLI 使用指南 (repo, issue, pr)")
 		fmt.Println()
 		fmt.Println("Install with: atomgit skills install")
 		return nil
