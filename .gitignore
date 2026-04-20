@@ -8,7 +8,7 @@ atomgit
 *.dylib
 # Test binary
 *.test
-
+bin/amc
 # Output
 *.out
 
