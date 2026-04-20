@@ -1,6 +1,6 @@
 module github.com/weibaohui/atomgit-cli
 
-go 1.21
+go 1.26
 
 require (
 	github.com/briandowns/spinner v1.23.0
