@@ -14,6 +14,7 @@ var skillContent []byte
 
 var (
 	skillsInstallPath string
+	installToClaude   bool
 )
 
 var skillsCmd = &cobra.Command{
@@ -27,9 +28,10 @@ var skillsInstallCmd = &cobra.Command{
 	Short: "Install skill",
 	Long: `Install the built-in skill to AtomGit CLI.
 
-The skill includes usage guide for repo, issue, and pr commands.
+The skill includes usage guide for repo, issue, pr, and skills commands.
 
 Default installation path: ~/.agents/skills
+Use --claude to install to ~/.claude/skills (Claude Code skills directory)
 Use --path to specify a different directory.`,
 	RunE: func(cmd *cobra.Command, args []string) error {
 		installPath := resolveInstallPath()
@@ -44,6 +46,14 @@ Use --path to specify a different directory.`,
 }
 
 func resolveInstallPath() string {
+	if installToClaude {
+		homeDir, err := os.UserHomeDir()
+		if err != nil {
+			return ".claude/skills"
+		}
+		return filepath.Join(homeDir, ".claude", "skills")
+	}
+
 	if skillsInstallPath == "" {
 		homeDir, err := os.UserHomeDir()
 		if err != nil {
@@ -93,6 +103,7 @@ var skillListCmd = &cobra.Command{
 
 func init() {
 	skillsInstallCmd.Flags().StringVarP(&skillsInstallPath, "path", "p", "", "Installation path (default: ~/.agents/skills, use '.' for ./skills)")
+	skillsInstallCmd.Flags().BoolVarP(&installToClaude, "claude", "c", false, "Install to Claude Code skills directory (~/.claude/skills)")
 
 	skillsCmd.AddCommand(skillsInstallCmd)
 	skillsCmd.AddCommand(skillListCmd)
