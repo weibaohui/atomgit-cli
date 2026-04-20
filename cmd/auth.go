@@ -83,7 +83,7 @@ var authTokenCmd = &cobra.Command{
 	RunE: func(cmd *cobra.Command, args []string) error {
 		token := config.GetToken()
 		if token == "" {
-			fmt.Fprintln(os.Stderr, "No token stored (try 'atomgit auth login').")
+			fmt.Fprintln(os.Stderr, "No token stored (try 'amc auth login').")
 			os.Exit(1)
 			return nil
 		}
