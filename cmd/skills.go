@@ -9,7 +9,7 @@ import (
 	"github.com/spf13/cobra"
 )
 
-//go:embed skills/atomgit-cli/SKILL.md
+//go:embed skills/atomgit/SKILL.md
 var skillContent []byte
 
 var (
