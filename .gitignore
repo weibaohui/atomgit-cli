@@ -6,7 +6,6 @@ atomgit
 *.dll
 *.so
 *.dylib
-
 # Test binary
 *.test
 
