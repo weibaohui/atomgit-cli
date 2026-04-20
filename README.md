@@ -1,6 +1,6 @@
 # AtomGit CLI
 
-类 GitHub CLI (gh) 的 AtomGit 平台命令行工具，使用 Go 构建。
+类 GitHub CLI (gh) 的 AtomGit 平台命令行工具，使用 Go 构建。命令行简称为 `amc`。
 
 ## 功能特性
 
@@ -14,65 +14,87 @@
 
 ## 安装
 
+### Make 方式（推荐）
+
+```bash
+git clone https://atomgit.com/weibaohui/atomgit-cli.git
+cd atomgit-cli
+make install
+```
+
 ### 源码编译
 
 ```bash
-git clone https://github.com/weibaohui/atomgit-cli.git
+git clone https://atomgit.com/weibaohui/atomgit-cli.git
 cd atomgit-cli
-go build -o atomgit .
-sudo mv atomgit /usr/local/bin/
+make build
+# 或手动编译
+go build -o amc .
 ```
+
+### 安装 Skill（Claude Code 用户）
+
+```bash
+# 安装到 ~/.claude/skills（Claude Code skills 目录）
+amc skills install --claude
+
+# 安装到 ~/.agents/skills
+amc skills install
+```
+
+安装后 Claude Code 会自动加载 skill，在与 AtomGit/AtomGit 平台交互时会获得帮助提示。
 
 ### 使用
 
 ```bash
 # 登录
-atomgit auth login -t YOUR_TOKEN
+amc auth login -t YOUR_TOKEN
 
 # 仓库操作
-atomgit repo create my-project --public
-atomgit repo list
-atomgit repo view owner/repo
+amc repo create my-project --public
+amc repo list
+amc repo view owner/repo
 
 # Issue 操作
-atomgit issue list -R owner/repo
-atomgit issue view 123 -R owner/repo
+amc issue list -R owner/repo
+amc issue view 123 -R owner/repo
 
 # Pull Request
-atomgit pr list -R owner/repo
-atomgit pr view 456 -R owner/repo
+amc pr list -R owner/repo
+amc pr view 456 -R owner/repo
 
 # 代码浏览
-atomgit branch list -R owner/repo
-atomgit commit list -R owner/repo
-atomgit release list -R owner/repo
+amc branch list -R owner/repo
+amc commit list -R owner/repo
+amc release list -R owner/repo
 
 # 搜索
-atomgit search repos golang
-atomgit search users username
+amc search repos golang
+amc search users username
 
 # 直接调用 API
-atomgit api /api/v1/user
+amc api /api/v1/user
 ```
 
 ## 命令参考
 
 | 命令 | 说明 |
 |------|------|
-| `atomgit auth` | 认证 (login/logout/status) |
-| `atomgit repo` | 仓库管理 |
-| `atomgit issue` | Issue 管理 |
-| `atomgit pr` | Pull Request |
-| `atomgit branch` | 分支操作 |
-| `atomgit commit` | 提交历史 |
-| `atomgit release` | 发布版本 |
-| `atomgit tag` | 标签管理 |
-| `atomgit fork` | 叉取仓库 |
-| `atomgit star` | 收藏仓库 |
-| `atomgit user` | 用户信息 |
-| `atomgit org` | 组织管理 |
-| `atomgit search` | 搜索 |
-| `atomgit api` | 直接调用 API |
+| `amc auth` | 认证 (login/logout/status) |
+| `amc repo` | 仓库管理 |
+| `amc issue` | Issue 管理 |
+| `amc pr` | Pull Request |
+| `amc branch` | 分支操作 |
+| `amc commit` | 提交历史 |
+| `amc release` | 发布版本 |
+| `amc tag` | 标签管理 |
+| `amc fork` | 叉取仓库 |
+| `amc star` | 收藏仓库 |
+| `amc user` | 用户信息 |
+| `amc org` | 组织管理 |
+| `amc search` | 搜索 |
+| `amc api` | 直接调用 API |
+| `amc skills` | 技能管理 |
 
 ## 配置
 
@@ -85,8 +107,8 @@ token = "your-token"
 
 环境变量:
 
-- `ATOMGIT_TOKEN` - 访问令牌
-- `ATOMGIT_BASE_URL` - API 地址 (默认: `https://api.atomgit.com`)
+- `AMGIT_TOKEN` - 访问令牌
+- `AMGIT_BASE_URL` - API 地址 (默认: `https://api.atomgit.com`)
 
 ## 开发
 
@@ -95,7 +117,9 @@ token = "your-token"
 go mod download
 
 # 构建
-go build -o atomgit .
+make build        # 构建到 ./bin/amc
+make install      # 构建并安装到 ~/bin/amc
+make clean        # 清理
 
 # 测试
 go test ./...
