@@ -4,14 +4,13 @@ BINARY_NAME=amc
 INSTALL_DIR=$(HOME)/bin
 
 build:
-	go build -o $(BINARY_NAME) .
+	@mkdir -p $(INSTALL_DIR)
+	go build -o $(INSTALL_DIR)/$(BINARY_NAME) .
 
 clean:
-	rm -f $(BINARY_NAME)
+	rm -f $(INSTALL_DIR)/$(BINARY_NAME)
 
 install: build
-	@mkdir -p $(INSTALL_DIR)
-	@cp $(BINARY_NAME) $(INSTALL_DIR)/$(BINARY_NAME)
 	@chmod +x $(INSTALL_DIR)/$(BINARY_NAME)
 	@echo "Installed $(BINARY_NAME) to $(INSTALL_DIR)/$(BINARY_NAME)"
 	@echo ''
