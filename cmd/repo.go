@@ -176,11 +176,24 @@ var repoListCmd = &cobra.Command{
 	Short: "List your repositories",
 	Long:  `List your repositories on AtomGit.`,
 	RunE: func(cmd *cobra.Command, args []string) error {
+		visibility, _ := cmd.Flags().GetString("visibility")
+		affiliation, _ := cmd.Flags().GetString("affiliation")
+
 		s := spinner.New(spinner.CharSets[14], 100*1000*1000)
 		s.Suffix = " Loading repositories..."
 		s.Start()
 
-		data, err := httpclient.Get("/user/repos")
+		url := "/user/repos"
+		if affiliation != "" {
+			url += "?affiliation=" + affiliation
+		} else {
+			url += "?affiliation=owner"
+		}
+		if visibility != "" {
+			url += "&visibility=" + visibility
+		}
+
+		data, err := httpclient.Get(url)
 		s.Stop()
 
 		if err != nil {
@@ -611,6 +624,9 @@ func init() {
 	repoEditCmd.Flags().Bool("enable-projects", false, "Enable projects")
 
 	repoSyncCmd.Flags().StringP("branch", "b", "main", "Branch to sync")
+
+	repoListCmd.Flags().String("visibility", "", "Filter by visibility (all, public, private)")
+	repoListCmd.Flags().String("affiliation", "", "Affiliation (owner, collaborator, organization_member)")
 
 	repoCmd.AddCommand(repoCreateCmd)
 	repoCmd.AddCommand(repoDeleteCmd)
