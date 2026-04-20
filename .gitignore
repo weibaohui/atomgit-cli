@@ -33,5 +33,4 @@ Thumbs.db
 # Config (local)
 .env
 .env.local
-atomgit-cli
 .claude/settings.local.json
