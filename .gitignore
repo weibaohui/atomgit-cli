@@ -33,3 +33,4 @@ Thumbs.db
 # Config (local)
 .env
 .env.local
+atomgit-cli
