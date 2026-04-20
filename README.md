@@ -32,7 +32,7 @@ make build
 go build -o amc .
 ```
 
-### 安装 Skill（Claude Code 用户）
+### 安装 Skill
 
 ```bash
 # 安装到 ~/.claude/skills（Claude Code skills 目录）
