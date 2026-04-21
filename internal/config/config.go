@@ -16,9 +16,12 @@ func init() {
 	cfg.SetConfigName("config")
 	cfg.SetConfigType("toml")
 	cfg.AddConfigPath(getConfigDir())
-	cfg.Set("base_url", "https://api.atomgit.com")
-	cfg.Set("token", "")
 
+	// 先设置默认值
+	cfg.SetDefault("base_url", "https://api.atomgit.com")
+	cfg.SetDefault("token", "")
+
+	// 再读取配置文件（会覆盖默认值）
 	_ = cfg.ReadInConfig()
 }
 
