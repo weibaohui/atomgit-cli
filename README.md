@@ -1,6 +1,6 @@
 # AtomGit CLI
 
-类 GitHub CLI (gh) 的 AtomGit 平台命令行工具，使用 Go 构建。命令行简称为 `amc`。
+类 GitHub CLI (gh) 的 AtomGit 平台命令行工具，使用 Go 构建。命令行简称为 `atg`。
 
 ## 功能特性
 
@@ -29,17 +29,17 @@ git clone https://atomgit.com/weibaohui/atomgit-cli.git
 cd atomgit-cli
 make build
 # 或手动编译
-go build -o amc .
+go build -o atg .
 ```
 
 ### 安装 Skill
 
 ```bash
 # 安装到 ~/.claude/skills（Claude Code skills 目录）
-amc skills install --claude
+atg skills install --claude
 
 # 安装到 ~/.agents/skills
-amc skills install
+atg skills install
 ```
 
 安装后 Claude Code 会自动加载 skill，在与 AtomGit/AtomGit 平台交互时会获得帮助提示。
@@ -48,53 +48,53 @@ amc skills install
 
 ```bash
 # 登录
-amc auth login -t YOUR_TOKEN
+atg auth login -t YOUR_TOKEN
 
 # 仓库操作
-amc repo create my-project --public
-amc repo list
-amc repo view owner/repo
+atg repo create my-project --public
+atg repo list
+atg repo view owner/repo
 
 # Issue 操作
-amc issue list -R owner/repo
-amc issue view 123 -R owner/repo
+atg issue list -R owner/repo
+atg issue view 123 -R owner/repo
 
 # Pull Request
-amc pr list -R owner/repo
-amc pr view 456 -R owner/repo
+atg pr list -R owner/repo
+atg pr view 456 -R owner/repo
 
 # 代码浏览
-amc branch list -R owner/repo
-amc commit list -R owner/repo
-amc release list -R owner/repo
+atg branch list -R owner/repo
+atg commit list -R owner/repo
+atg release list -R owner/repo
 
 # 搜索
-amc search repos golang
-amc search users username
+atg search repos golang
+atg search users username
 
 # 直接调用 API
-amc api /api/v1/user
+atg api /api/v1/user
 ```
 
 ## 命令参考
 
 | 命令 | 说明 |
 |------|------|
-| `amc auth` | 认证 (login/logout/status) |
-| `amc repo` | 仓库管理 |
-| `amc issue` | Issue 管理 |
-| `amc pr` | Pull Request |
-| `amc branch` | 分支操作 |
-| `amc commit` | 提交历史 |
-| `amc release` | 发布版本 |
-| `amc tag` | 标签管理 |
-| `amc fork` | 叉取仓库 |
-| `amc star` | 收藏仓库 |
-| `amc user` | 用户信息 |
-| `amc org` | 组织管理 |
-| `amc search` | 搜索 |
-| `amc api` | 直接调用 API |
-| `amc skills` | 技能管理 |
+| `atg auth` | 认证 (login/logout/status) |
+| `atg repo` | 仓库管理 |
+| `atg issue` | Issue 管理 |
+| `atg pr` | Pull Request |
+| `atg branch` | 分支操作 |
+| `atg commit` | 提交历史 |
+| `atg release` | 发布版本 |
+| `atg tag` | 标签管理 |
+| `atg fork` | 叉取仓库 |
+| `atg star` | 收藏仓库 |
+| `atg user` | 用户信息 |
+| `atg org` | 组织管理 |
+| `atg search` | 搜索 |
+| `atg api` | 直接调用 API |
+| `atg skills` | 技能管理 |
 
 ## 配置
 
@@ -117,8 +117,8 @@ token = "your-token"
 go mod download
 
 # 构建
-make build        # 构建到 ./bin/amc
-make install      # 构建并安装到 ~/bin/amc
+make build        # 构建到 ./bin/atg
+make install      # 构建并安装到 ~/bin/atg
 make clean        # 清理
 
 # 测试

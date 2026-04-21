@@ -87,7 +87,7 @@ func DeleteToken() error {
 }
 
 func UserConfigHint() string {
-	return fmt.Sprintf("Set a token with `amc auth login` or export ATOMGIT_TOKEN. Config home: %s/.config/atomgit-cli", os.Getenv("HOME"))
+	return fmt.Sprintf("Set a token with `atg auth login` or export ATOMGIT_TOKEN. Config home: %s/.config/atomgit-cli", os.Getenv("HOME"))
 }
 
 func MaskToken(token string) string {
