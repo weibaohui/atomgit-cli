@@ -48,7 +48,16 @@ var hookListCmd = &cobra.Command{
 var hookCreateCmd = &cobra.Command{
 	Use:   "create",
 	Short: "Create a webhook",
-	Long:  `Create a new webhook in a repository.`,
+	Long: `Create a new webhook in a repository.
+
+Supported events:
+  * push_events          - 推送事件
+  * tag_push_events      - Tag推送事件
+  * issues_events        - Issue事件
+  * note_events          - 评论事件
+  * merge_requests_events - Pull Request事件
+
+Use "*" to listen to all events (default).`,
 	RunE: func(cmd *cobra.Command, args []string) error {
 		repo, _ := cmd.Flags().GetString("repo")
 		url, _ := cmd.Flags().GetString("url")
@@ -76,7 +85,13 @@ var hookCreateCmd = &cobra.Command{
 		if secret != "" {
 			body["secret"] = secret
 		}
-		if events != "" {
+		if events == "*" {
+			body["push_events"] = true
+			body["tag_push_events"] = true
+			body["issues_events"] = true
+			body["note_events"] = true
+			body["merge_requests_events"] = true
+		} else if events != "" {
 			body["events"] = events
 		}
 
@@ -130,7 +145,16 @@ var hookViewCmd = &cobra.Command{
 var hookUpdateCmd = &cobra.Command{
 	Use:   "update <id>",
 	Short: "Update a webhook",
-	Long:  `Update a webhook.`,
+	Long: `Update a webhook.
+
+Supported events:
+  * push_events          - 推送事件
+  * tag_push_events      - Tag推送事件
+  * issues_events        - Issue事件
+  * note_events          - 评论事件
+  * merge_requests_events - Pull Request事件
+
+Use "*" to listen to all events.`,
 	Args:  cobra.ExactArgs(1),
 	RunE: func(cmd *cobra.Command, args []string) error {
 		repo, _ := cmd.Flags().GetString("repo")
@@ -152,7 +176,13 @@ var hookUpdateCmd = &cobra.Command{
 		if secret != "" {
 			body["secret"] = secret
 		}
-		if events != "" {
+		if events == "*" {
+			body["push_events"] = true
+			body["tag_push_events"] = true
+			body["issues_events"] = true
+			body["note_events"] = true
+			body["merge_requests_events"] = true
+		} else if events != "" {
 			body["events"] = events
 		}
 
@@ -245,12 +275,12 @@ func init() {
 	hookCreateCmd.Flags().StringP("repo", "R", "", "Select repository (OWNER/REPO)")
 	hookCreateCmd.Flags().StringP("url", "", "", "Webhook URL (required)")
 	hookCreateCmd.Flags().StringP("secret", "", "", "Webhook secret")
-	hookCreateCmd.Flags().StringP("events", "", "*", "Events to trigger webhook")
+	hookCreateCmd.Flags().StringP("events", "", "*", "Events to trigger (use * for all events)")
 	hookViewCmd.Flags().StringP("repo", "R", "", "Select repository (OWNER/REPO)")
 	hookUpdateCmd.Flags().StringP("repo", "R", "", "Select repository (OWNER/REPO)")
 	hookUpdateCmd.Flags().StringP("url", "", "", "Webhook URL")
 	hookUpdateCmd.Flags().StringP("secret", "", "", "Webhook secret")
-	hookUpdateCmd.Flags().StringP("events", "", "", "Events to trigger webhook")
+	hookUpdateCmd.Flags().StringP("events", "", "", "Events to trigger (use * for all events)")
 	hookDeleteCmd.Flags().StringP("repo", "R", "", "Select repository (OWNER/REPO)")
 	hookTestCmd.Flags().StringP("repo", "R", "", "Select repository (OWNER/REPO)")
 
