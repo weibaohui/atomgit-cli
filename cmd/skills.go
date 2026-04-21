@@ -9,7 +9,7 @@ import (
 	"github.com/spf13/cobra"
 )
 
-//go:embed skills/amc/SKILL.md
+//go:embed skills/atg/SKILL.md
 var skillContent []byte
 
 var (
@@ -76,7 +76,7 @@ func resolveInstallPath() string {
 }
 
 func extractSkill(installPath string) error {
-	skillDir := filepath.Join(installPath, "amc")
+	skillDir := filepath.Join(installPath, "atg")
 	if err := os.MkdirAll(skillDir, 0755); err != nil {
 		return err
 	}
@@ -94,9 +94,9 @@ var skillListCmd = &cobra.Command{
 	Short: "List available skills",
 	RunE: func(cmd *cobra.Command, args []string) error {
 		fmt.Println("Available skills:")
-		fmt.Println("  amc    AtomGit CLI 使用指南 (repo, issue, pr)")
+		fmt.Println("  atg    AtomGit CLI 使用指南 (repo, issue, pr)")
 		fmt.Println()
-		fmt.Println("Install with: amc skills install")
+		fmt.Println("Install with: atg skills install")
 		return nil
 	},
 }

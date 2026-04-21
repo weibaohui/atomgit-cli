@@ -5,24 +5,24 @@ import (
 )
 
 var rootCmd = &cobra.Command{
-	Use:   "amc",
+	Use:   "atg",
 	Short: "AtomGit CLI (gh-like)",
 	Long: `AtomGit CLI for interacting with the AtomGit platform.
 
 EXAMPLES
-  $ amc repo create my-project --public
-  $ amc repo list
-  $ amc issue list -R owner/repo
-  $ amc pr list -R owner/repo
-  $ amc search repos golang
-  $ amc user info
-  $ amc branch list -R owner/repo
-  $ amc commit list -R owner/repo
-  $ amc release list -R owner/repo
-  $ amc api /api/v1/user
+  $ atg repo create my-project --public
+  $ atg repo list
+  $ atg issue list -R owner/repo
+  $ atg pr list -R owner/repo
+  $ atg search repos golang
+  $ atg user info
+  $ atg branch list -R owner/repo
+  $ atg commit list -R owner/repo
+  $ atg release list -R owner/repo
+  $ atg api /api/v1/user
 
 LEARN MORE
-  Use 'amc <command> --help' for more information about a command.`,
+  Use 'atg <command> --help' for more information about a command.`,
 	Version: "0.1.0",
 }
 
